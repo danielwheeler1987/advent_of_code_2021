@@ -1,9 +1,7 @@
-require 'pry'
-
 input_file = File.open('input.txt', 'r')
 input_file_lines = input_file.readlines()
 
-def some_recursive_method(index, lines)
+def determine_rating(index, lines, &block)
     return lines.first if lines.size == 1
 
     zero_results = []
@@ -11,45 +9,26 @@ def some_recursive_method(index, lines)
 
     lines.each do |line|
         split_line_data = line.split ''
-
-        if split_line_data[index] == '0'
-            zero_results << line
-        else
-            one_results << line
-        end
+        
+        zero_results << line if split_line_data[index] == '0'
+        one_results << line if split_line_data[index] == '1'
     end
 
-    next_lines = zero_results.size > one_results.size ? zero_results : one_results
-
-    some_recursive_method(index + 1, next_lines)
+    next_lines =  yield(zero_results, one_results) if block_given?
+    determine_rating(index + 1, next_lines, &block)
 end
 
-def some_recursive_method_two(index, lines)
-    return lines.first if lines.size == 1
+oxygen_generator_testing = determine_rating(0, input_file_lines) do |zero_results, one_results|
+    zero_results.size > one_results.size ? zero_results : one_results
+end
+puts "Oxygen generator testing: #{oxygen_generator_testing.to_i(2)}\n"
 
-    zero_results = []
-    one_results = []
-
-    lines.each do |line|
-        split_line_data = line.split ''
-
-        if split_line_data[index] == '0'
-            zero_results << line
-        else
-            one_results << line
-        end
-    end
-
+co2_scrubber_rating = determine_rating(0, input_file_lines) do |zero_results, one_results|
     next_lines = zero_results.size < one_results.size ? zero_results : one_results
     next_lines = zero_results if zero_results.size == one_results.size
-
-    some_recursive_method_two(index + 1, next_lines)
+    next_lines
 end
+puts "CO2 scrubber rating: #{co2_scrubber_rating.to_i(2)}\n"
 
-oxygen_generator_testing = some_recursive_method(0, input_file_lines)
-puts "Oxygen Generator Testing: #{oxygen_generator_testing.to_i(2)}\n"
-
-oxygen_generator_testing = some_recursive_method_two(0, input_file_lines)
-puts "Oxygen Generator Testing: #{oxygen_generator_testing.to_i(2)}\n"
-
+puts "Life support rating: #{oxygen_generator_testing.to_i(2) * co2_scrubber_rating.to_i(2)}\n"
 # Answer is 4481199 after multiplying the above together
