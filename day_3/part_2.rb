@@ -1,40 +1,55 @@
+require 'pry'
+
 input_file = File.open('input.txt', 'r')
 input_file_lines = input_file.readlines()
-lines = []
 
-# This is trash.. Need to make this dynamic
-row_1 = []
-row_2 = []
-row_3 = []
-row_4 = []
-row_5 = []
-row_6 = []
-row_7 = []
-row_8 = []
-row_9 = []
-row_10 = []
-row_11 = []
-row_12 = []
+def some_recursive_method(index, lines)
+    return lines.first if lines.size == 1
 
-for line in input_file_lines
-    row_data = line.split ''
-    
-    row_1 << row_data[0]
-    row_2 << row_data[1]
-    row_3 << row_data[2]
-    row_4 << row_data[3]
-    row_5 << row_data[4]
-    row_6 << row_data[5]
-    row_7 << row_data[6]
-    row_8 << row_data[7]
-    row_9 << row_data[8]
-    row_10 << row_data[9]
-    row_11 << row_data[10]
-    row_12 << row_data[11]
+    zero_results = []
+    one_results = []
+
+    lines.each do |line|
+        split_line_data = line.split ''
+
+        if split_line_data[index] == '0'
+            zero_results << line
+        else
+            one_results << line
+        end
+    end
+
+    next_lines = zero_results.size > one_results.size ? zero_results : one_results
+
+    some_recursive_method(index + 1, next_lines)
 end
 
-all_rows = [row_1, row_2, row_3, row_4, row_5, row_6, row_7, row_8, row_9, row_10, row_11, row_12]
+def some_recursive_method_two(index, lines)
+    return lines.first if lines.size == 1
 
-all_rows.each do |row|
-    puts row
+    zero_results = []
+    one_results = []
+
+    lines.each do |line|
+        split_line_data = line.split ''
+
+        if split_line_data[index] == '0'
+            zero_results << line
+        else
+            one_results << line
+        end
+    end
+
+    next_lines = zero_results.size < one_results.size ? zero_results : one_results
+    next_lines = zero_results if zero_results.size == one_results.size
+
+    some_recursive_method_two(index + 1, next_lines)
 end
+
+oxygen_generator_testing = some_recursive_method(0, input_file_lines)
+puts "Oxygen Generator Testing: #{oxygen_generator_testing.to_i(2)}\n"
+
+oxygen_generator_testing = some_recursive_method_two(0, input_file_lines)
+puts "Oxygen Generator Testing: #{oxygen_generator_testing.to_i(2)}\n"
+
+# Answer is 4481199 after multiplying the above together
